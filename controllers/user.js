@@ -119,7 +119,7 @@ exports.login = async (req, res) => {
             last_name: user.last_name,
             token: token,
             verified: user.verified,
-            message: "Registered Successfuly! Please activate your email to start using Digital Hub!",
+            message: "Login successful!",
         })
     } catch {
         res.status(500).json({message: error.message})
