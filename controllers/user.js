@@ -1,6 +1,7 @@
 const { validateEmail, validateLength, validateUsername } = require("../helpers/validation");
 const User = require("../models/User")
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
 const { generateToken } = require("../helpers/tokens");
 const { sendVerificationEmail } = require("../helpers/mailer");
 
@@ -61,9 +62,66 @@ exports.register = async (req, res) => {
         
         const url = `${process.env.BASE_URL}/activate/${emailVerificationToken}`;
         sendVerificationEmail(user.email, user.first_name, url)
+        const token = generateToken({ id: user._id.toString() }, "7d");
+        res.send({
+            id: user._id,
+            username: user.username,
+            picture: user.picture,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            token: token,
+            verified: user.verified,
+            message: "Registered Successfuly! Please activate your email to start using Digital Hub!",
+        })
+
         
-        res.json(user);
     } catch (error) {
         res.status(500).json({message: error.message})
 }
+}
+
+exports.activateAccount = async (req, res) => {
+    try {
+        const { token } = req.body;
+        const user = jwt.verify(token, process.env.TOKEN_SECRET)
+        //checking if user is already active
+        const check = await User.findById(user.id);
+        if (check.verified == true) {
+            return res.status(400).json({ message: "This account is already activated." });
+        } else {
+            await User.findByIdAndUpdate(user.id, { verified: true });
+            return res.status(200).json({ message: "Account has been activated successfully" });
+        }
+    } catch (error) {
+        res.status(500).json({message: error.message})
+}
+}
+
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email: email });
+        //checking if there's an user
+        if (!user) return res.status(400).json({message: "The email address entered is not connected to an account."})
+        
+        //checking if password entered is correct
+        const check = await bcrypt.compare(password, user.password);
+        if (!check) {
+            return res.status(400).json({message: "Invalid credentials. Please try again."})
+        }
+
+        const token = generateToken({ id: user._id.toString() }, "7d");
+        res.send({
+            id: user._id,
+            username: user.username,
+            picture: user.picture,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            token: token,
+            verified: user.verified,
+            message: "Registered Successfuly! Please activate your email to start using Digital Hub!",
+        })
+    } catch {
+        res.status(500).json({message: error.message})
+    }
 }
