@@ -119,9 +119,12 @@ exports.login = async (req, res) => {
             last_name: user.last_name,
             token: token,
             verified: user.verified,
-            message: "Login successful!",
         })
     } catch {
         res.status(500).json({message: error.message})
     }
+}
+
+exports.auth = (req, res) => {
+    res.json("welcome from auth")
 }
