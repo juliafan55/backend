@@ -128,3 +128,14 @@ exports.login = async (req, res) => {
 exports.auth = (req, res) => {
     res.json("welcome from auth")
 }
+
+exports.getProfile = async (req, res) => {
+    try {
+        const { username } = req.params;
+        const profile = await User.find({ username: username }).select("-password");
+        res.json(profile);
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+}
+
