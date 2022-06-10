@@ -138,7 +138,7 @@ exports.getProfile = async (req, res) => {
             return res.json({ok:false})
         }
         const post = await Post.find({user: profile._id}).populate("user")
-        res.json(profile, post);
+        res.json({profile, post});
     } catch (error) {
         res.status(500).json({message: error.message})
     }
