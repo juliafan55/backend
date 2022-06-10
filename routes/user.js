@@ -8,7 +8,7 @@ router.post("/register", register)
 router.post("/activate", activateAccount)
 router.post("/login", login)
 router.post("/auth", authUser, auth)
-router.get("/getProfile/:username", getProfile)
+router.get("/getProfile/:username", authUser, getProfile)
 
 
 module.exports = router;

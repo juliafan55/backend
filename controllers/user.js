@@ -132,7 +132,10 @@ exports.auth = (req, res) => {
 exports.getProfile = async (req, res) => {
     try {
         const { username } = req.params;
-        const profile = await User.find({ username: username }).select("-password");
+        const profile = await User.findOne({ username: username }).select("-password");
+        if (!profile) {
+            return res.json({ok:false})
+        }
         res.json(profile);
     } catch (error) {
         res.status(500).json({message: error.message})
