@@ -65,10 +65,10 @@ const userSchema = mongoose.Schema(
         type: Boolean,
         default: false,
       },
-      friends: {
+      friends: [{
         type: Array,
         default: [],
-      },
+      }],
       following: {
         type: Array,
         default: [],
