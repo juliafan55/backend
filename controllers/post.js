@@ -12,10 +12,16 @@ exports.createPost = async (req, res) => {
 
 exports.getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find()
-      .populate("user")
-      .sort({ createdAt: -1 });
-    res.json(posts);
+    // const posts = await Post.find()
+    //   .populate("user")
+    //   .sort({ createdAt: -1 });
+    // res.json(posts);
+    const userPosts = await Post.find({ user: req.user.id })
+      .populate("user", "first_name last_name picture username cover")
+      .populate("comments.commentBy", "first_name last_name picture username")
+      .sort({ createdAt: -1 })
+    res.json(userPosts)
+  
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -41,8 +47,8 @@ exports.comment = async (req, res) => {
       {
         new: true,
       }
-    ).populate("comments.commentBy", "picture first_name last_name username");
-    res.json(newComments.comments);
+    ).populate('comments.commentBy', "first_name last_name username commentAt picture");
+    res.json(newComments.comments)
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
