@@ -294,7 +294,7 @@ exports.unfollow = async (req, res) => {
     }
 };
   
-xports.acceptRequest = async (req, res) => {
+exports.acceptRequest = async (req, res) => {
     try {
       if (req.user.id !== req.params.id) {
         const receiver = await User.findById(req.user.id);
